@@ -2,6 +2,7 @@
 using Allup.Models;
 using Allup.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -27,10 +28,10 @@ namespace Allup.Controllers
             HomeViewModel homeVM = new HomeViewModel
             {
                 Categories = _context.Categories.Where(ct => ct.IsMain == true && ct.IsDelete == false).ToList(),
-                Products = _context.Products.Where(pr => pr.IsDelete == false).ToList(),
+                Products = _context.Products.Where(pr => pr.IsDelete == false).Include(pro=>pro.Images).ToList(),
                 ProductCategories = _context.ProductCategories.Where(prCt => prCt.Category.IsDelete == false &&
                 prCt.Product.IsDelete == false).ToList(),
-                ProductImages = _context.ProductImages.ToList()
+                ProductImages = _context.ProductImages.Include(p => p.Product).ToList()
             };
             return View(homeVM);
         }
