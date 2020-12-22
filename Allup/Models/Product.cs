@@ -15,6 +15,7 @@ namespace Allup.Models
         [Required]
         public double Price { get; set; }
         public double ExTax { get; set; }
+        [MaxLength(5)]
         public double Rate { get; set; }
         public bool IsDelete { get; set; }
         public string ProductCode { get; set; }

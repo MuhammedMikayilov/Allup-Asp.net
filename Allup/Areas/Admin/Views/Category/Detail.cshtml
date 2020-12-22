@@ -1,0 +1,43 @@
+﻿@model Category
+@{
+    ViewData["Title"] = "Detail";
+}
+
+<div class="container bg-white">
+    @if (Model.IsMain)
+    {
+        <div class="col-md-12 p-2 bg-dark mb-3">
+            <img src="~/assets/images/@Model.Image" width="200" />
+        </div>
+    }
+
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Category name: <span class="text-danger">@Model.Name</span></h4>
+                <div>
+                    @*@Html.Raw(Model.Description)*@
+                    @if (Model.IsMain)
+                    {
+                        <h4>Subcategories</h4>
+                        <ol>
+                            @foreach (var child in Model.Children)
+                            {
+                                <li>@child.Name</li>
+                            }
+                        </ol>
+                    }
+
+
+                    @if (!Model.IsMain)
+                    {
+                        <p><strong>Parent:</strong> <em>@Model.Parent.Name</em></p>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Go Back</a>
+</div>
+

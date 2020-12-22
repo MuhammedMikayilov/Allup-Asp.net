@@ -120,7 +120,6 @@
                 <div class="product-items">
                     <div class="row product-active">
                         <div class="col-lg-2">
-
                             @foreach (Product product in Model.Products)
                             {
                                 if (proCount % 2 == 0 && proCount != 0)
@@ -131,7 +130,10 @@
                                     <div class="product-image">
                                         <a href="single-product.html">
                                             <img class="first-image" src="~/assets/images/product/@product.Images.ElementAt(0).Image" alt="product">
-                                            <img class="second-image" src="~/assets/images/product/@product.Images.ElementAt(1).Image" alt="product">
+                                            @if (product.Images.Count > 1)
+                                            {
+                                                <img class="second-image" src="~/assets/images/product/@product.Images.ElementAt(1).Image" alt="product">
+                                            }
                                         </a>
                                         <ul class="product-meta">
                                             <li><a href="#"><i class="icon ion-bag"></i></a></li>
@@ -142,15 +144,19 @@
                                     </div>
                                     <div class="product-content">
                                         <ul class="product-rating">
-                                            @for (int i = 0; i < product.Rate; i++)
+                                            <!-- #region Rate -->
+                                            @if (product.Rate > 5)
                                             {
-                                                <li class="rating-on"><i class="fas fa-star"></i></li>
+                                                product.Rate = 5;<!-- Eger boyuk olarsa 5 ulduz gorunmesi ucun -->
+                                            }
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                               
+                                                <li class='rating-@(i<=product.Rate?"on":"off")'><i class="fas fa-star"></i></li>
+                                            }
+                                            
+                                            <!-- #endregion -->
 
-                                            }
-                                            @for (int i = 0; i < (5 - product.Rate); i++)
-                                            {
-                                                <li><i class="fas fa-star"></i></li>
-                                            }
 
                                         </ul>
                                         <h4 class="product-title"><a href="single-product.html">@product.Title</a></h4>

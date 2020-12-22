@@ -180,7 +180,8 @@ namespace Allup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Rate")
-                        .HasColumnType("float");
+                        .HasColumnType("float")
+                        .HasMaxLength(5);
 
                     b.Property<int>("SaleCount")
                         .HasColumnType("int");

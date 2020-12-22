@@ -28,10 +28,10 @@ namespace Allup.Controllers
             HomeViewModel homeVM = new HomeViewModel
             {
                 Categories = _context.Categories.Where(ct => ct.IsMain == true && ct.IsDelete == false).ToList(),
-                Products = _context.Products.Where(pr => pr.IsDelete == false).Include(pro=>pro.Images).ToList(),
+                Products = _context.Products.Where(pr => pr.IsDelete == false).Include(pro=>pro.Images).Take(12).ToList(),
                 ProductCategories = _context.ProductCategories.Where(prCt => prCt.Category.IsDelete == false &&
                 prCt.Product.IsDelete == false).ToList(),
-                ProductImages = _context.ProductImages.Include(p => p.Product).ToList()
+                //ProductImages = _context.ProductImages.Include(p => p.Product).ToList()
             };
             return View(homeVM);
         }
