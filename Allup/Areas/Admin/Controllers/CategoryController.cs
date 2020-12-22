@@ -26,7 +26,7 @@ namespace Allup.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
-            return View(_context.Categories.Where(ct => ct.IsDelete == false).Include(c=>c.Parent).OrderByDescending(ctr => ctr.Id));
+            return View(_context.Categories.Where(ct => ct.IsDelete == false).Include(c => c.Parent).OrderByDescending(ctr => ctr.Id));
         }
 
         public IActionResult Create()
@@ -48,12 +48,12 @@ namespace Allup.Areas.Admin.Controllers
 
                 if (isExist)
                 {
-                    ModelState.AddModelError("Name","This category already exist");
+                    ModelState.AddModelError("Name", "This category already exist");
                     return View();
                 }
-                if(category.Photos == null)
+                if (category.Photos == null)
                 {
-                    ModelState.AddModelError("","You have to upload image");
+                    ModelState.AddModelError("", "You have to upload image");
                     return View();
                 }
 
@@ -81,8 +81,8 @@ namespace Allup.Areas.Admin.Controllers
                     ModelState.AddModelError("", "Select Main Category");
                     return View();
                 }
-                Category mainCtg = _context.Categories.Where(c=>c.IsDelete==false&&c.IsMain==true).Include(c => c.Children)
-                    .FirstOrDefault(c=>c.Id== MainId);
+                Category mainCtg = _context.Categories.Where(c => c.IsDelete == false && c.IsMain == true).Include(c => c.Children)
+                    .FirstOrDefault(c => c.Id == MainId);
                 if (mainCtg == null)
                 {
                     ModelState.AddModelError("", "Select Main Category");
@@ -119,28 +119,70 @@ namespace Allup.Areas.Admin.Controllers
         {
             GetMainCategory();
             if (id == null) return NotFound();
-            Category category = await _context.Categories.FindAsync(id);
-            if (category == null) return NotFound();
-
+            Category categories = _context.Categories.Where(c => c.IsDelete == false)
+                .FirstOrDefault(c => c.Id == id);
+            if (categories == null) return NotFound();
+            categories.IsDelete = false;
             await _context.SaveChangesAsync();
-            return View(category);
+            return View(categories);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(Category category,int? id)
+        public async Task<IActionResult> Update(int? id, Category category, int? Main_Id)
         {
             GetMainCategory();
             if (id == null) return NotFound();
-            Category changedCtr = await _context.Categories.FindAsync(id);
-
-            Category isExist = _context.Categories.Where(c => c.IsDelete == false).FirstOrDefault(c => c.Name.ToLower() == category.Name.ToLower());
             if (category == null) return NotFound();
 
-            changedCtr.Name = category.Name;
+            Category categ = await _context.Categories.FindAsync(id);
+
+            //there's a bug
+            //if (categ.IsMain)
+            //{
+            //    bool isExist = _context.Categories.Where(c => c.IsDelete == false)
+            //        .Any(c => c.Name.Trim().ToLower() == category.Name.Trim().ToLower());
+
+            //    if (isExist)
+            //    {
+            //        ModelState.AddModelError("Name", "This category already exist");
+            //        return View();
+            //    }
+            //}
+
+            if (categ.IsMain && category.Photos != null)
+            {
+                string folder = Path.Combine("assets", "images");
+                string fileName = await category.Photos.SaveImageAsync(_env.WebRootPath, folder);
+                categ.Image = fileName;
+            }
+            if (!categ.IsMain)
+            {
+                Category mainCtg = _context.Categories.Where(c => c.IsDelete == false && c.IsMain == true).Include(c => c.Children)
+                    .FirstOrDefault(c => c.Id == Main_Id);
+                if (mainCtg == null)
+                {
+                    ModelState.AddModelError("", "Select Main Category");
+                    return View();
+                }
+
+                bool isExist = mainCtg.Children.Any(cC => cC.Name.Trim().ToLower() == category.Name.Trim().ToLower());
+
+                if (isExist)
+                {
+                    ModelState.AddModelError("", $"This category already exist in {mainCtg.Name}");
+                    return View();
+                }
+
+                categ.Parent = mainCtg;
+            }
+            
+            categ.Name = category.Name;
+            //categ.Parent.Name = category.Parent.Name;
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+            //return Json(category.Photos);
         }
 
         public IActionResult Delete(int? id)

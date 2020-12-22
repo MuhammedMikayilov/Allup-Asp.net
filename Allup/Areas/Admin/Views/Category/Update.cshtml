@@ -7,17 +7,65 @@
     @if (Model.IsMain)
     {
         <div class="col-md-12 p-2 bg-dark mb-3">
-            <img src="~/assets/images/@Model.Image" width="200" />
+            <img src="~/assets/images/@Model.Image" width="200" height="200" />
         </div>
     }
 
-    <div class="col-md-6 grid-margin stretch-card">
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Update Category</h4>
+                <form class="forms-sample" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label asp-for="@Model.Name">Name</label>
+                        <input asp-for="@Model.Name" class="form-control" id="exampleInputName1" placeholder="Name">
+                        <span class="text-danger" asp-validation-for="@Model.Name"></span>
+                    </div>
+
+                   
+                    <div class="form-group" id="@(Model.IsMain? "" : "mainCategories")">
+                        @if (Model.IsMain)
+                        {
+                            <label asp-for="@Model.Photos">Change Photo</label>
+                            <input asp-for="@Model.Photos" class="form-control" id="exampleInputName1" placeholder="Name">
+                            <span class="text-danger" asp-validation-for="@Model.Photos"></span>
+                        }
+                        else
+                        {
+                            <label asp-for="@Model.Photos">Main Categories</label>
+                            <select class="custom-select" name="Main_Id">
+                                @foreach (var main in ViewBag.MainCategory)
+                                {
+                                    <option value="@main.Id">@main.Name</option>
+                                }
+                            </select>
+                            <span class="text-danger" asp-validation-for="@Model.Photos"></span>
+                        }
+                    </div>
+                    
+                        <div class="form-group" id="mainCategories">
+                            
+                        </div>
+
+
+                    @*@if (!Model.IsMain)
+        {
+            <p>Parent: <em>@Model.Parent.Name</em></p>
+        }*@
+                    <button type="submit" class="btn btn-primary mr-2">Cahnge</button>
+                    <button class="btn btn-light" asp-action="Index">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--<div class="col-md-6 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
                 <form class="forms-sample" method="post">
                     <div class="form-group">
                         <label asp-for="@Model.Name">Category Name</label>
-                        <input asp-for="@Model.Name" class="form-control" placeholder="Name">
+                        <input asp-for="@Model.Name" class="form-control" id="exampleInputName1" placeholder="Name">
                         <span class="text-danger" asp-validation-for="@Model.Name"></span>
                     </div>
                 </form>
@@ -25,31 +73,32 @@
                     <label asp-for="@Model.Photos">Main Categories</label>
                     <span class="text-danger" asp-validation-for="@Model.Photos"></span>
                 </div>
-                <div>
-                    @*@Html.Raw(Model.Description)*@
-                    @*@if (Model.IsMain && Model.Children.Count() != 0)
-                    {
-                        <ul>
-                            @foreach (var child in Model.Children)
-                            {
-                                <li>@child.Name</li>
-                            }
-                        </ul>
-                    }
 
-                    @if (!Model.IsMain)
-                    {
-                        <p>Parent: <em>@Model.Parent.Name</em></p>
-                    }*@
-                </div>
+                <div>-->
+    @*@Html.Raw(Model.Description)*@
+    @*@if (Model.IsMain && Model.Children.Count() != 0)
+        {
+            <ul>
+                @foreach (var child in Model.Children)
+                {
+                    <li>@child.Name</li>
+                }
+            </ul>
+        }
+
+        @if (!Model.IsMain)
+        {
+            <p>Parent: <em>@Model.Parent.Name</em></p>
+        }*@
+    <!--</div>
             </div>
         </div>
 
-    </div>
-    <h3 class="text-danger">Are you sure?</h3>
+    </div>-->
+    @*<h3 class="text-danger">Are you sure?</h3>
     <form method="post">
         <button type="submit" class="btn btn-danger">Update</button>
     </form>
-    <a asp-action="Index" class="btn btn-secondary mt-3">Go Back</a>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Go Back</a>*@
 </div>
 
