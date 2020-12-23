@@ -46,6 +46,8 @@ namespace Allup.Areas.Admin.Controllers
                 bool isExist = _context.Categories.Where(c => c.IsDelete == false && c.IsMain == true)
                     .Any(c => c.Name.Trim().ToLower() == category.Name.Trim().ToLower());
 
+
+
                 if (isExist)
                 {
                     ModelState.AddModelError("Name", "This category already exist");
@@ -132,23 +134,30 @@ namespace Allup.Areas.Admin.Controllers
         public async Task<IActionResult> Update(int? id, Category category, int? Main_Id)
         {
             GetMainCategory();
+            
             if (id == null) return NotFound();
             if (category == null) return NotFound();
 
             Category categ = await _context.Categories.FindAsync(id);
 
             //there's a bug
-            //if (categ.IsMain)
-            //{
-            //    bool isExist = _context.Categories.Where(c => c.IsDelete == false)
-            //        .Any(c => c.Name.Trim().ToLower() == category.Name.Trim().ToLower());
+            if (categ.IsMain)
+            {
 
-            //    if (isExist)
-            //    {
-            //        ModelState.AddModelError("Name", "This category already exist");
-            //        return View();
-            //    }
-            //}
+                if (categ.Name != category.Name)
+                {
+                    bool isExist = _context.Categories.Where(c => c.IsDelete == false && c.IsMain == true)
+                    .Any(c => c.Name.Trim().ToLower() == category.Name.Trim().ToLower());
+
+                    if (isExist)
+                    {
+
+                        ModelState.AddModelError("Name", "This category already exist");
+                        return View(categ);
+                    }
+                }
+                
+            }
 
             if (categ.IsMain && category.Photos != null)
             {
@@ -163,24 +172,22 @@ namespace Allup.Areas.Admin.Controllers
                 if (mainCtg == null)
                 {
                     ModelState.AddModelError("", "Select Main Category");
-                    return View();
-                }
+                    return View(categ);
+                } 
 
                 bool isExist = mainCtg.Children.Any(cC => cC.Name.Trim().ToLower() == category.Name.Trim().ToLower());
 
                 if (isExist)
                 {
                     ModelState.AddModelError("", $"This category already exist in {mainCtg.Name}");
-                    return View();
+                    return View(categ);
                 }
 
                 categ.Parent = mainCtg;
             }
             
             categ.Name = category.Name;
-            //categ.Parent.Name = category.Parent.Name;
             await _context.SaveChangesAsync();
-
             return RedirectToAction(nameof(Index));
             //return Json(category.Photos);
         }
